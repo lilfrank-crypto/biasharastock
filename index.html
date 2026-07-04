@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BiasharaStock — Inventory & Sales for Kenyan Businesses</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0C0C10">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BiasharaStock">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" href="./icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0C0C10; --ink2:#1C1C24; --ink3:#2C2C38; --ink4:#3C3C4C;
+  --mist:#F7F6F3; --mist2:#EEECEA; --mist3:#E0DDD8;
+  --text:#0C0C10; --text2:#5C5C70; --text3:#9C9CAC;
+  --saffron:#F5A623; --saffron-dim:rgba(245,166,35,0.12); --saffron-glow:rgba(245,166,35,0.3);
+  --jade:#10B97A; --jade-dim:rgba(16,185,122,0.1);
+  --cobalt:#2563EB; --cobalt-dim:rgba(37,99,235,0.1);
+  --rose:#E53E3E; --rose-dim:rgba(229,62,62,0.1);
+  --white:#FFFFFF;
+  --font:'Plus Jakarta Sans',sans-serif; --mono:'DM Mono',monospace;
+  --r:10px; --r2:16px; --r3:24px;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.06);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.1),0 12px 40px rgba(0,0,0,0.08);
+  --shadow-lg:0 8px 24px rgba(0,0,0,0.12),0 24px 64px rgba(0,0,0,0.1);
+}
+html{overflow-x:hidden}
+body{font-family:var(--font);background:var(--mist);color:var(--text);min-height:100vh;overflow-x:hidden}
+::selection{background:var(--saffron-dim);color:var(--saffron)}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--mist)}
+::-webkit-scrollbar-thumb{background:var(--mist3);border-radius:3px}
+input,textarea,select,button{font-family:var(--font)}
+
+/* LOADER */
+#loader{position:fixed;inset:0;z-index:9999;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity .5s ease,visibility .5s ease}
+#loader.gone{opacity:0;visibility:hidden;pointer-events:none}
+.ld-logo{display:flex;align-items:center;gap:12px}
+.ld-mark{width:48px;height:48px;border-radius:14px;background:var(--saffron);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:var(--ink)}
+.ld-name{font-size:24px;font-weight:800;color:var(--white);letter-spacing:-.02em}
+.ld-name span{color:var(--saffron)}
+.ld-bar{width:200px;height:2px;background:var(--ink3);border-radius:1px;overflow:hidden;margin-top:8px}
+.ld-fill{height:100%;background:var(--saffron);border-radius:1px;animation:ldprogress 1s ease forwards}
+@keyframes ldprogress{from{width:0}to{width:100%}}
+.ld-sub{font-size:13px;color:#666;margin-top:4px}
+
+/* AUTH */
+#auth-screen{min-height:100vh;display:flex;background:var(--ink);position:relative;overflow:hidden}
+.auth-left{flex:1;display:flex;flex-direction:column;justify-content:center;padding:80px 60px;position:relative;z-index:1}
+.auth-right{width:480px;flex-shrink:0;background:var(--mist);display:flex;flex-direction:column;justify-content:center;padding:60px 52px;position:relative}
+.auth-bg-pattern{position:absolute;inset:0;background-image:radial-gradient(rgba(245,166,35,0.06) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.auth-glow{position:absolute;top:-200px;left:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(245,166,35,0.1) 0%,transparent 70%);pointer-events:none}
+.auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:60px}
+.auth-mark{width:42px;height:42px;border-radius:12px;background:var(--saffron);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--ink)}
+.auth-brandname{font-size:20px;font-weight:800;color:var(--white);letter-spacing:-.02em}
+.auth-brandname span{color:var(--saffron)}
+.auth-headline{font-size:clamp(30px,4vw,48px);font-weight:800;color:var(--white);line-height:1.08;letter-spacing:-.03em;margin-bottom:20px}
+.auth-headline em{font-style:normal;color:var(--saffron)}
+.auth-pitch{font-size:16px;color:#888;line-height:1.7;max-width:440px;margin-bottom:48px}
+.auth-features{display:flex;flex-direction:column;gap:16px}
+.auth-feat{display:flex;align-items:center;gap:14px}
+.auth-feat-icon{width:36px;height:36px;border-radius:9px;background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.auth-feat-text{font-size:14px;color:#aaa;line-height:1.4}
+.auth-feat-text strong{color:var(--white);font-weight:600}
+.auth-form-title{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.02em;margin-bottom:6px}
+.auth-form-sub{font-size:14px;color:var(--text2);margin-bottom:32px}
+.auth-tabs{display:flex;gap:3px;background:var(--mist2);border-radius:10px;padding:3px;margin-bottom:28px}
+.auth-tab{flex:1;padding:9px;border-radius:7px;background:none;border:none;cursor:pointer;font-size:13px;font-weight:600;color:var(--text3);transition:all .15s}
+.auth-tab.active{background:var(--white);color:var(--text);box-shadow:var(--shadow)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fgroup{margin-bottom:16px}
+.flabel{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;letter-spacing:.02em;text-transform:uppercase}
+.finput{width:100%;padding:11px 14px;background:var(--white);border:1.5px solid var(--mist3);border-radius:var(--r);font-size:14px;color:var(--text);transition:all .15s;outline:none}
+.finput:focus{border-color:var(--saffron);box-shadow:0 0 0 3px var(--saffron-dim)}
+.finput::placeholder{color:var(--text3)}
+.fselect{width:100%;padding:11px 14px;background:var(--white);border:1.5px solid var(--mist3);border-radius:var(--r);font-size:14px;color:var(--text);appearance:none;cursor:pointer;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%239C9CAC' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:18px}
+.fselect:focus{border-color:var(--saffron);outline:none}
+.auth-err{background:var(--rose-dim);border:1px solid rgba(229,62,62,0.2);border-radius:var(--r);padding:11px 14px;font-size:13px;color:var(--rose);margin-bottom:14px;display:none}
+.btn-primary{width:100%;padding:13px;border-radius:var(--r);background:var(--saffron);color:var(--ink);font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all .2s;letter-spacing:-.01em}
+.btn-primary:hover{background:#f0a010;transform:translateY(-1px);box-shadow:0 6px 20px var(--saffron-glow)}
+
+/* APP SHELL */
+#app{display:none;min-height:100vh;background:var(--mist)}
+.app-shell{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.sidebar{background:var(--ink);display:flex;flex-direction:column;padding:28px 16px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:0 8px 28px;border-bottom:1px solid var(--ink3);margin-bottom:20px}
+.sb-mark{width:34px;height:34px;border-radius:9px;background:var(--saffron);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--ink);flex-shrink:0}
+.sb-name{font-size:16px;font-weight:800;color:var(--white);letter-spacing:-.02em}
+.sb-name span{color:var(--saffron)}
+.sb-section{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink4);padding:0 10px;margin-bottom:6px;margin-top:16px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;color:#888;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;margin-bottom:2px}
+.sb-item svg{width:17px;height:17px;flex-shrink:0}
+.sb-item:hover{background:var(--ink2);color:var(--white)}
+.sb-item.active{background:var(--saffron-dim);color:var(--saffron);border:1px solid rgba(245,166,35,0.15)}
+.sb-badge{margin-left:auto;background:var(--saffron);color:var(--ink);font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px}
+.sb-user{margin-top:auto;padding:14px 10px 0;border-top:1px solid var(--ink3);display:flex;align-items:center;gap:10px}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:var(--saffron);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--ink);flex-shrink:0}
+.sb-user-meta{flex:1;min-width:0}
+.sb-user-name{font-size:13px;font-weight:600;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-biz{font-size:11px;color:var(--ink4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-logout{background:none;border:none;cursor:pointer;color:var(--ink4);padding:4px;border-radius:6px;transition:color .15s;flex-shrink:0}
+.sb-logout:hover{color:var(--rose)}
+
+.mobile-topbar{display:none;position:sticky;top:0;z-index:50;background:var(--ink);padding:14px 16px;align-items:center;justify-content:space-between}
+.mtb-left{display:flex;align-items:center;gap:10px}
+.mtb-mark{width:28px;height:28px;border-radius:8px;background:var(--saffron);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--ink)}
+.mtb-name{font-size:14px;font-weight:700;color:var(--white)}
+.mtb-menu-btn{background:var(--ink2);border:1px solid var(--ink3);width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--white)}
+.mobile-nav-drawer{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.5)}
+.mobile-nav-drawer.open{display:block}
+.mnd-panel{position:absolute;top:0;left:0;bottom:0;width:280px;background:var(--ink);padding:24px 16px;display:flex;flex-direction:column}
+.mnd-close{align-self:flex-end;background:var(--ink2);border:1px solid var(--ink3);width:32px;height:32px;border-radius:8px;color:var(--white);cursor:pointer;margin-bottom:16px}
+
+.main{background:var(--mist);overflow-y:auto;min-height:100vh}
+.page{display:none;padding:40px}
+.page.active{display:block}
+.ph{margin-bottom:36px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.ph-eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--saffron);margin-bottom:8px}
+.ph-title{font-size:32px;font-weight:800;color:var(--text);letter-spacing:-.03em;margin-bottom:8px;line-height:1.1}
+.ph-sub{font-size:15px;color:var(--text2);max-width:540px;line-height:1.6}
+.ph-action{padding:12px 22px;border-radius:var(--r);background:var(--saffron);color:var(--ink);font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.ph-action:hover{background:#f0a010;transform:translateY(-1px)}
+
+/* DASHBOARD */
+.dash-welcome{background:var(--ink);border-radius:var(--r3);padding:36px 40px;margin-bottom:28px;position:relative;overflow:hidden;display:grid;grid-template-columns:1fr auto;align-items:center;gap:24px}
+.dash-welcome::before{content:'';position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(245,166,35,0.12) 0%,transparent 70%)}
+.dw-greeting{font-size:14px;color:#888;margin-bottom:6px}
+.dw-name{font-size:28px;font-weight:800;color:var(--white);letter-spacing:-.02em;margin-bottom:8px}
+.dw-sub{font-size:14px;color:#666;line-height:1.5}
+.dw-action{padding:12px 24px;border-radius:var(--r);background:var(--saffron);color:var(--ink);font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.dw-action:hover{background:#f0a010;transform:translateY(-1px)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:var(--white);border-radius:var(--r2);padding:22px 24px;box-shadow:var(--shadow)}
+.stat-icon{font-size:22px;margin-bottom:12px}
+.stat-val{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1;margin-bottom:4px}
+.stat-lbl{font-size:12px;color:var(--text3);font-weight:500}
+.stat-val.warn{color:var(--rose)}
+.dash-row{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;margin-bottom:20px}
+.dash-card{background:var(--white);border-radius:var(--r2);padding:24px;box-shadow:var(--shadow)}
+.dc-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+.dc-sub{font-size:12px;color:var(--text3);margin-bottom:20px}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text3)}
+.empty-state .es-icon{font-size:36px;margin-bottom:12px}
+.empty-state .es-text{font-size:14px}
+.ai-insight-box{background:var(--ink);border-radius:var(--r);padding:16px 18px;margin-top:14px}
+.ai-insight-label{font-size:11px;font-weight:700;color:var(--saffron);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ai-insight-body{font-size:13px;color:#bbb;line-height:1.6}
+
+/* PRODUCT GRID */
+.product-toolbar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.search-input{flex:1;min-width:200px;padding:11px 16px;background:var(--white);border:1.5px solid var(--mist3);border-radius:var(--r);font-size:14px;outline:none}
+.search-input:focus{border-color:var(--saffron)}
+.filter-select{padding:11px 14px;background:var(--white);border:1.5px solid var(--mist3);border-radius:var(--r);font-size:13px;cursor:pointer;outline:none}
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.product-card{background:var(--white);border-radius:var(--r2);padding:20px;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s;position:relative;cursor:pointer}
+.product-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.product-card.low-stock{border:1.5px solid rgba(229,62,62,0.3)}
+.pc-badge{position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em}
+.pc-badge.low{background:var(--rose-dim);color:var(--rose)}
+.pc-badge.ok{background:var(--jade-dim);color:var(--jade)}
+.pc-icon{font-size:28px;margin-bottom:12px}
+.pc-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;padding-right:60px}
+.pc-cat{font-size:11px;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.04em}
+.pc-stock-row{display:flex;align-items:baseline;gap:6px;margin-bottom:10px}
+.pc-stock-val{font-size:22px;font-weight:800;color:var(--text);font-family:var(--mono)}
+.pc-stock-unit{font-size:13px;color:var(--text3)}
+.pc-stock-bar{height:5px;background:var(--mist2);border-radius:3px;overflow:hidden;margin-bottom:14px}
+.pc-stock-fill{height:100%;border-radius:3px;transition:width .3s ease}
+.pc-price{font-size:14px;font-weight:600;color:var(--text2);font-family:var(--mono)}
+.pc-actions{display:flex;gap:8px;margin-top:14px}
+.pc-btn{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:600;border:none;cursor:pointer;transition:all .15s}
+.pc-btn-sell{background:var(--saffron);color:var(--ink)}
+.pc-btn-sell:hover{background:#f0a010}
+.pc-btn-restock{background:var(--mist);color:var(--text)}
+.pc-btn-restock:hover{background:var(--mist2)}
+
+/* PRODUCT FORM CARD */
+.form-card{background:var(--white);border-radius:var(--r2);padding:28px 32px;box-shadow:var(--shadow);max-width:560px}
+.fc-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+
+/* SELL MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--white);border-radius:var(--r2);width:100%;max-width:420px;padding:28px;box-shadow:var(--shadow-lg)}
+.modal-title{font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--text3);margin-bottom:24px}
+.qty-stepper{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.qty-btn{width:40px;height:40px;border-radius:10px;background:var(--mist);border:1.5px solid var(--mist3);font-size:18px;font-weight:700;cursor:pointer;color:var(--text);flex-shrink:0;transition:all .15s}
+.qty-btn:hover{background:var(--mist2)}
+.qty-display{flex:1;text-align:center}
+.qty-num{font-size:32px;font-weight:800;font-family:var(--mono);color:var(--text)}
+.qty-unit{font-size:13px;color:var(--text3)}
+.qty-remaining{font-size:12px;color:var(--text3);text-align:center;margin-bottom:20px}
+.sell-total{background:var(--mist);border-radius:var(--r);padding:16px 20px;text-align:center;margin-bottom:20px}
+.sell-total-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.sell-total-val{font-size:28px;font-weight:800;color:var(--text);font-family:var(--mono)}
+.modal-actions{display:flex;gap:10px}
+.modal-btn{flex:1;padding:12px;border-radius:var(--r);font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all .15s}
+.modal-btn-cancel{background:var(--mist);color:var(--text)}
+.modal-btn-confirm{background:var(--saffron);color:var(--ink)}
+.modal-btn-confirm:hover{background:#f0a010}
+
+/* M-PESA PARSER */
+#page-mpesa{max-width:760px}
+.mpesa-card{background:var(--white);border-radius:var(--r2);padding:28px 32px;box-shadow:var(--shadow)}
+.mpesa-textarea{width:100%;padding:14px 16px;background:var(--mist);border:1.5px solid var(--mist3);border-radius:var(--r);font-size:14px;font-family:var(--mono);resize:vertical;min-height:100px;outline:none;line-height:1.6}
+.mpesa-textarea:focus{border-color:var(--saffron);background:var(--white)}
+.mpesa-hint{font-size:12px;color:var(--text3);margin-top:8px;line-height:1.5}
+.btn-ai{display:flex;align-items:center;gap:8px;padding:12px 22px;border-radius:var(--r);background:var(--ink);color:var(--white);font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all .15s;margin-top:14px}
+.btn-ai:hover{background:var(--ink2);transform:translateY(-1px)}
+.btn-ai.loading{opacity:.7;cursor:not-allowed}
+.ai-spinner{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);border-top-color:var(--white);animation:spin .7s linear infinite;display:none}
+.btn-ai.loading .ai-spinner{display:block}
+.btn-ai.loading .btn-ai-text{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mpesa-result{margin-top:24px;display:none}
+.mpesa-result.show{display:block}
+.mpesa-extracted{background:var(--jade-dim);border:1.5px solid rgba(16,185,122,0.25);border-radius:var(--r2);padding:22px 24px}
+.mpe-title{font-size:13px;font-weight:700;color:var(--jade);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.mpe-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.mpe-field-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.mpe-field-val{font-size:15px;font-weight:700;color:var(--text);font-family:var(--mono)}
+.mpe-low-confidence{background:var(--rose-dim);color:var(--rose);font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:14px}
+.recent-mpesa{margin-top:28px}
+.rm-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--mist2)}
+.rm-item:last-child{border-bottom:none}
+.rm-name{font-size:14px;font-weight:600;color:var(--text)}
+.rm-meta{font-size:12px;color:var(--text3)}
+.rm-amt{font-size:14px;font-weight:700;font-family:var(--mono);color:var(--jade)}
+
+/* BARCODE SCANNER */
+#page-scan{max-width:600px}
+.scan-card{background:var(--white);border-radius:var(--r2);padding:28px 32px;box-shadow:var(--shadow);text-align:center}
+#scan-reader{width:100%;border-radius:var(--r);overflow:hidden;margin-bottom:16px;background:var(--ink);min-height:240px;display:flex;align-items:center;justify-content:center}
+.scan-placeholder{color:#666;font-size:14px;padding:60px 20px}
+.scan-result-card{background:var(--mist);border-radius:var(--r);padding:20px;margin-top:16px;text-align:left;display:none}
+.scan-result-card.show{display:block}
+
+/* SALES HISTORY */
+.sale-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--mist2)}
+.sale-row:last-child{border-bottom:none}
+.sale-left{display:flex;align-items:center;gap:12px}
+.sale-icon{width:38px;height:38px;border-radius:9px;background:var(--saffron-dim);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.sale-name{font-size:14px;font-weight:600;color:var(--text)}
+.sale-meta{font-size:12px;color:var(--text3);margin-top:2px}
+.sale-amt{font-size:15px;font-weight:700;font-family:var(--mono);color:var(--jade)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;z-index:600;background:var(--ink);border:1px solid var(--ink3);border-radius:var(--r);padding:13px 20px;font-size:14px;color:var(--white);box-shadow:var(--shadow-lg);display:none;animation:toast-in .25s ease forwards;max-width:340px}
+@keyframes toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+@media(max-width:1024px){
+  .app-shell{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .mobile-topbar{display:flex}
+  .page{padding:20px}
+  .dash-row{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .mpe-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .auth-left{display:none}
+  .auth-right{width:100%;padding:40px 28px}
+  .form-row{grid-template-columns:1fr}
+  .product-grid{grid-template-columns:1fr 1fr}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+
+<div id="loader">
+  <div class="ld-logo"><div class="ld-mark">B</div><div class="ld-name">Biashara<span>Stock</span></div></div>
+  <div class="ld-bar"><div class="ld-fill"></div></div>
+  <div class="ld-sub">Inventory & AI tools for Kenyan shops</div>
+</div>
+
+<div id="auth-screen">
+  <div class="auth-bg-pattern"></div>
+  <div class="auth-glow"></div>
+  <div class="auth-left">
+    <div class="auth-logo"><div class="auth-mark">B</div><div class="auth-brandname">Biashara<span>Stock</span></div></div>
+    <h1 class="auth-headline">Your shop's stock.<br>Tracked live.<br><em>Powered by AI.</em></h1>
+    <p class="auth-pitch">Manage your inventory like a real shop — see exactly how much stock remains after every sale, and let AI read your M-Pesa messages for you.</p>
+    <div class="auth-features">
+      <div class="auth-feat"><div class="auth-feat-icon">📦</div><div class="auth-feat-text"><strong>Live stock tracking</strong> — sell 2kg of maize, see exactly what's left automatically.</div></div>
+      <div class="auth-feat"><div class="auth-feat-icon">📱</div><div class="auth-feat-text"><strong>AI M-Pesa Reader</strong> — paste the SMS, AI extracts customer name, amount, and code.</div></div>
+      <div class="auth-feat"><div class="auth-feat-icon">📷</div><div class="auth-feat-text"><strong>Barcode scanning</strong> — scan a product with your camera instead of typing.</div></div>
+      <div class="auth-feat"><div class="auth-feat-icon">💡</div><div class="auth-feat-text"><strong>AI stock insights</strong> — know what's running low before you run out.</div></div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-form-title">Get started</div>
+    <div class="auth-form-sub">Free forever. No credit card needed.</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="authMode('login')">Sign in</button>
+      <button class="auth-tab" onclick="authMode('register')">Create account</button>
+    </div>
+    <div class="auth-err" id="auth-err"></div>
+    <div id="form-login">
+      <div class="fgroup"><label class="flabel">Email</label><input class="finput" type="email" id="li-email" placeholder="you@yourbusiness.com"></div>
+      <div class="fgroup"><label class="flabel">Password</label><input class="finput" type="password" id="li-pass" placeholder="••••••••"></div>
+      <button class="btn-primary" onclick="doLogin()">Sign in →</button>
+      <p style="text-align:center;font-size:12px;color:var(--text3);margin-top:12px">Demo: any email + password (6+ chars)</p>
+    </div>
+    <div id="form-register" style="display:none">
+      <div class="form-row">
+        <div class="fgroup"><label class="flabel">Full name</label><input class="finput" id="rg-name" placeholder="e.g. Mary Wambui"></div>
+        <div class="fgroup"><label class="flabel">Phone</label><input class="finput" id="rg-phone" placeholder="07xx xxx xxx"></div>
+      </div>
+      <div class="fgroup"><label class="flabel">Email</label><input class="finput" type="email" id="rg-email" placeholder="you@yourbusiness.com"></div>
+      <div class="fgroup"><label class="flabel">Business name</label><input class="finput" id="rg-biz" placeholder="e.g. Wambui General Store"></div>
+      <div class="fgroup">
+        <label class="flabel">Business type</label>
+        <select class="fselect" id="rg-sector">
+          <option value="">Select your type of business</option>
+          <option>Retail / Grocery / Duka</option><option>Agriculture / Produce</option>
+          <option>Hardware & Construction</option><option>Food & Beverage</option>
+          <option>Pharmacy / Healthcare</option><option>Other</option>
+        </select>
+      </div>
+      <div class="fgroup"><label class="flabel">Password</label><input class="finput" type="password" id="rg-pass" placeholder="Min. 6 characters"></div>
+      <button class="btn-primary" onclick="doRegister()">Create account →</button>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="mobile-topbar" id="mobile-topbar">
+    <div class="mtb-left"><div class="mtb-mark">B</div><div class="mtb-name" id="mtb-page-name">Dashboard</div></div>
+    <button class="mtb-menu-btn" onclick="openMobileDrawer()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+  </div>
+  <div class="mobile-nav-drawer" id="mobile-nav-drawer" onclick="if(event.target===this)closeMobileDrawer()">
+    <div class="mnd-panel">
+      <button class="mnd-close" onclick="closeMobileDrawer()">✕</button>
+      <div class="sb-logo" style="border:none;padding-bottom:8px;margin-bottom:8px"><div class="sb-mark">B</div><div class="sb-name">Biashara<span>Stock</span></div></div>
+      <button class="sb-item" onclick="goPage('dashboard');closeMobileDrawer()">📊 Dashboard</button>
+      <button class="sb-item" onclick="goPage('products');closeMobileDrawer()">📦 My Stock</button>
+      <button class="sb-item" onclick="goPage('addproduct');closeMobileDrawer()">➕ Add Product</button>
+      <button class="sb-item" onclick="goPage('scan');closeMobileDrawer()">📷 Scan Barcode</button>
+      <button class="sb-item" onclick="goPage('mpesa');closeMobileDrawer()">📱 M-Pesa Reader</button>
+      <button class="sb-item" onclick="goPage('sales');closeMobileDrawer()">🧾 Sales History</button>
+      <div style="margin-top:auto;padding-top:16px;border-top:1px solid var(--ink3)"><button class="sb-item" onclick="doLogout()">🚪 Sign out</button></div>
+    </div>
+  </div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sb-logo"><div class="sb-mark">B</div><div class="sb-name">Biashara<span>Stock</span></div></div>
+      <div class="sb-section">Overview</div>
+      <button class="sb-item active" onclick="goPage('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Dashboard
+      </button>
+      <div class="sb-section">Inventory</div>
+      <button class="sb-item" onclick="goPage('products')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8L12 3 3 8m18 0l-9 5m9-5v9l-9 5m0-9L3 8m9 5v9M3 8v9l9 5"/></svg>
+        My Stock
+      </button>
+      <button class="sb-item" onclick="goPage('addproduct')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
+        Add Product
+      </button>
+      <button class="sb-item" onclick="goPage('scan')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM18 18h3v3h-3zM14 21h3M21 14v3"/></svg>
+        Scan Barcode
+        <span class="sb-badge">AI</span>
+      </button>
+      <div class="sb-section">AI Tools</div>
+      <button class="sb-item" onclick="goPage('mpesa')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 18h6"/></svg>
+        M-Pesa Reader
+        <span class="sb-badge">AI</span>
+      </button>
+      <button class="sb-item" onclick="goPage('sales')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg>
+        Sales History
+      </button>
+      <button id="pwa-install-btn" onclick="installPwa()" style="display:none;align-items:center;justify-content:center;gap:8px;margin:0 4px 14px;padding:10px;border-radius:9px;background:var(--saffron-dim);border:1px solid rgba(245,166,35,0.25);color:var(--saffron);font-size:13px;font-weight:600;cursor:pointer">
+        ⬇ Install App
+      </button>
+      <div class="sb-user">
+        <div class="sb-avatar" id="sb-avatar">?</div>
+        <div class="sb-user-meta"><div class="sb-user-name" id="sb-uname">—</div><div class="sb-user-biz" id="sb-ubiz">—</div></div>
+        <button class="sb-logout" onclick="doLogout()" title="Sign out">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="dash-welcome">
+          <div>
+            <div class="dw-greeting" id="dw-greeting">Good morning</div>
+            <div class="dw-name" id="dw-name">Welcome back 👋</div>
+            <div class="dw-sub" id="dw-sub">Here's how your shop is doing today.</div>
+          </div>
+          <button class="dw-action" onclick="goPage('addproduct')">+ Add Product</button>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-icon">📦</div><div class="stat-val" id="stat-products">0</div><div class="stat-lbl">Products in stock</div></div>
+          <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-val" id="stat-value">KSh 0</div><div class="stat-lbl">Total stock value</div></div>
+          <div class="stat-card"><div class="stat-icon">🧾</div><div class="stat-val" id="stat-sales">0</div><div class="stat-lbl">Sales recorded</div></div>
+          <div class="stat-card"><div class="stat-icon">⚠️</div><div class="stat-val warn" id="stat-low">0</div><div class="stat-lbl">Low stock items</div></div>
+        </div>
+        <div class="dash-row">
+          <div class="dash-card">
+            <div class="dc-title">Recent sales</div>
+            <div class="dc-sub">Your last transactions</div>
+            <div id="dash-recent-sales"></div>
+          </div>
+          <div class="dash-card">
+            <div class="dc-title">💡 AI Stock Insight</div>
+            <div class="dc-sub">What needs your attention</div>
+            <div class="ai-insight-box">
+              <div class="ai-insight-label">🤖 AI Analysis</div>
+              <div class="ai-insight-body" id="dash-ai-insight">Add products to your stock to get AI-powered insights on what's running low.</div>
+            </div>
+            <button class="btn-ai" id="dash-insight-btn" onclick="getDashboardInsight()" style="width:100%;justify-content:center;margin-top:14px">
+              <div class="ai-spinner" id="dash-insight-spin"></div>
+              <span class="btn-ai-text">✨ Refresh AI insight</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MY STOCK -->
+      <div class="page" id="page-products">
+        <div class="ph">
+          <div>
+            <div class="ph-eyebrow">Inventory</div>
+            <h1 class="ph-title">My Stock</h1>
+            <p class="ph-sub">Every product you sell, with live quantity remaining. Click a card to sell or restock.</p>
+          </div>
+          <button class="ph-action" onclick="goPage('addproduct')">+ Add Product</button>
+        </div>
+        <div class="product-toolbar">
+          <input class="search-input" id="product-search" placeholder="Search products..." oninput="renderProducts()">
+          <select class="filter-select" id="product-filter" onchange="renderProducts()">
+            <option value="all">All products</option>
+            <option value="low">Low stock only</option>
+          </select>
+        </div>
+        <div class="product-grid" id="product-grid"></div>
+      </div>
+
+      <!-- ADD PRODUCT -->
+      <div class="page" id="page-addproduct">
+        <div class="ph"><div><div class="ph-eyebrow">Inventory</div><h1 class="ph-title">Add a product</h1><p class="ph-sub">Add an item to your shop's stock. You can scan a barcode instead of typing — see the Scan Barcode page.</p></div></div>
+        <div class="form-card">
+          <div class="fc-title">📦 Product details</div>
+          <div class="fgroup"><label class="flabel">Product name</label><input class="finput" id="np-name" placeholder="e.g. Maize, Cement, Sukari"></div>
+          <div class="form-row">
+            <div class="fgroup">
+              <label class="flabel">Category</label>
+              <select class="fselect" id="np-cat">
+                <option>Groceries</option><option>Produce</option><option>Hardware</option>
+                <option>Beverages</option><option>Household</option><option>Other</option>
+              </select>
+            </div>
+            <div class="fgroup">
+              <label class="flabel">Unit</label>
+              <select class="fselect" id="np-unit">
+                <option value="kg">Kilograms (kg)</option><option value="g">Grams (g)</option>
+                <option value="litre">Litres</option><option value="piece">Pieces</option>
+                <option value="bag">Bags</option><option value="box">Boxes</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="fgroup"><label class="flabel">Current stock quantity</label><input class="finput" type="number" id="np-stock" placeholder="e.g. 50"></div>
+            <div class="fgroup"><label class="flabel">Low stock alert below</label><input class="finput" type="number" id="np-threshold" placeholder="e.g. 10"></div>
+          </div>
+          <div class="form-row">
+            <div class="fgroup"><label class="flabel">Cost price (KSh per unit)</label><input class="finput" type="number" id="np-cost" placeholder="e.g. 80"></div>
+            <div class="fgroup"><label class="flabel">Selling price (KSh per unit)</label><input class="finput" type="number" id="np-price" placeholder="e.g. 100"></div>
+          </div>
+          <div class="fgroup"><label class="flabel">Barcode (optional — or scan one)</label><input class="finput" id="np-barcode" placeholder="Scanned or typed barcode number"></div>
+          <button class="btn-primary" onclick="addProduct()">+ Add to stock</button>
+        </div>
+      </div>
+
+      <!-- SCAN BARCODE -->
+      <div class="page" id="page-scan">
+        <div class="ph"><div><div class="ph-eyebrow">AI Tool</div><h1 class="ph-title">Scan a barcode</h1><p class="ph-sub">Use your laptop or phone camera to scan a product barcode. If it matches a product already in your stock, you can sell instantly. If not, you can add it as new.</p></div></div>
+        <div class="scan-card">
+          <div id="scan-reader"><div class="scan-placeholder">Camera preview will appear here</div></div>
+          <button class="btn-ai" id="scan-start-btn" onclick="toggleScanner()" style="margin:0 auto">
+            <span class="btn-ai-text">📷 Start camera scan</span>
+          </button>
+          <p class="mpesa-hint">Works on laptops with a webcam and phones with a camera. Your browser will ask for camera permission.</p>
+          <div class="scan-result-card" id="scan-result-card">
+            <div class="mpe-field-label">Scanned barcode</div>
+            <div class="mpe-field-val" id="scan-result-code" style="margin-bottom:14px">—</div>
+            <div id="scan-match-area"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- M-PESA READER -->
+      <div class="page" id="page-mpesa">
+        <div class="ph"><div><div class="ph-eyebrow">AI Tool — Headline Feature</div><h1 class="ph-title">AI M-Pesa Reader</h1><p class="ph-sub">Paste the M-Pesa confirmation SMS you received. AI reads it and extracts the customer's name, amount, and transaction code automatically — no typing required.</p></div></div>
+        <div class="mpesa-card">
+          <div class="fgroup">
+            <label class="flabel">Paste the M-Pesa SMS message</label>
+            <textarea class="mpesa-textarea" id="mpesa-input" placeholder="e.g. QHZ7KP2031 Confirmed. You have received Ksh1,500.00 from JOHN KAMAU 0712345678 on 30/6/26 at 2:14 PM. New M-PESA balance is Ksh23,400.00."></textarea>
+            <div class="mpesa-hint">Works with both "received" and "paid" M-Pesa messages. Long-press the SMS on your phone, copy, then paste here.</div>
+          </div>
+          <button class="btn-ai" id="mpesa-btn" onclick="parseMpesa()">
+            <div class="ai-spinner" id="mpesa-spin"></div>
+            <span class="btn-ai-text">✨ Read this message</span>
+          </button>
+
+          <div class="mpesa-result" id="mpesa-result">
+            <div class="mpesa-extracted">
+              <div class="mpe-title">✅ Extracted by AI</div>
+              <div id="mpe-low-conf-warning"></div>
+              <div class="mpe-grid">
+                <div><div class="mpe-field-label">Customer name</div><div class="mpe-field-val" id="mpe-name">—</div></div>
+                <div><div class="mpe-field-label">Amount</div><div class="mpe-field-val" id="mpe-amount">—</div></div>
+                <div><div class="mpe-field-label">Phone number</div><div class="mpe-field-val" id="mpe-phone">—</div></div>
+                <div><div class="mpe-field-label">Transaction code</div><div class="mpe-field-val" id="mpe-code">—</div></div>
+                <div><div class="mpe-field-label">Date</div><div class="mpe-field-val" id="mpe-date">—</div></div>
+                <div><div class="mpe-field-label">Type</div><div class="mpe-field-val" id="mpe-type">—</div></div>
+              </div>
+              <button class="btn-primary" onclick="recordMpesaSale()">💾 Record this as a sale</button>
+            </div>
+          </div>
+
+          <div class="recent-mpesa" id="recent-mpesa-list"></div>
+        </div>
+      </div>
+
+      <!-- SALES HISTORY -->
+      <div class="page" id="page-sales">
+        <div class="ph"><div><div class="ph-eyebrow">Records</div><h1 class="ph-title">Sales history</h1><p class="ph-sub">Every sale recorded, whether logged manually, via barcode scan, or via the AI M-Pesa reader.</p></div></div>
+        <div class="dash-card" id="sales-history-card"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- SELL MODAL -->
+<div class="modal-overlay" id="sell-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="sm-product-name">Sell product</div>
+    <div class="modal-sub" id="sm-product-stock">0 kg available</div>
+    <div class="qty-stepper">
+      <button class="qty-btn" onclick="adjustQty(-1)">−</button>
+      <div class="qty-display"><div class="qty-num" id="sm-qty">1</div><div class="qty-unit" id="sm-unit">kg</div></div>
+      <button class="qty-btn" onclick="adjustQty(1)">+</button>
+    </div>
+    <div class="qty-remaining" id="sm-remaining">Remaining after sale: 49 kg</div>
+    <div class="sell-total">
+      <div class="sell-total-label">Total</div>
+      <div class="sell-total-val" id="sm-total">KSh 0</div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeSellModal()">Cancel</button>
+      <button class="modal-btn modal-btn-confirm" onclick="confirmSale()">✓ Confirm sale</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESTOCK MODAL -->
+<div class="modal-overlay" id="restock-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="rm-product-name">Restock product</div>
+    <div class="modal-sub">Add new stock quantity</div>
+    <div class="fgroup"><label class="flabel">Quantity to add</label><input class="finput" type="number" id="rm-qty" placeholder="e.g. 20"></div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeRestockModal()">Cancel</button>
+      <button class="modal-btn modal-btn-confirm" onclick="confirmRestock()">✓ Add stock</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── API BASE ──────────────────────────────────────────────────────────────
+// Same-origin relative paths — works automatically once deployed to Vercel.
+const API_BASE = '';
+
+async function apiCall(endpoint, body) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+  try {
+    const res = await fetch(API_BASE + endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify(body)
+    });
+    clearTimeout(timeoutId);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Server error (' + res.status + ')');
+    return data;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError') throw new Error('Request timed out. Please try again.');
+    if (err.message.includes('Failed to fetch')) throw new Error('Could not reach the server. Make sure this is deployed and running (the AI features need the backend API to be live).');
+    throw err;
+  }
+}
+
+// ── FIREBASE INIT ─────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyCREBKw8DPfuRE8_HW0RTrJfMu73MiY8AI",
+  authDomain: "boredabroad-6de85.firebaseapp.com",
+  projectId: "boredabroad-6de85",
+  storageBucket: "boredabroad-6de85.firebasestorage.app",
+  messagingSenderId: "208030892151",
+  appId: "1:208030892151:web:15ce41322fa7724a1b8672",
+  measurementId: "G-HVSNEGXFF0"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+// Firestore's built-in offline cache — this is what makes the app usable
+// with no connection at all, beyond just the app shell.
+db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+  console.warn('Firestore offline persistence not enabled:', err.code);
+});
+const USERS_COLLECTION = 'biasharastock_users';
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let currentUser = null;
+let sellModalProduct = null;
+let sellModalQty = 1;
+let restockModalProduct = null;
+let html5QrCode = null;
+let scannerActive = false;
+let saveDebounceTimer = null;
+
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('loader').classList.add('gone'), 1200);
+});
+
+// Restore session automatically if already signed in (works offline too,
+// since Firebase Auth caches the session and Firestore serves from cache).
+auth.onAuthStateChanged((user) => {
+  if (user && !currentUser) {
+    db.collection(USERS_COLLECTION).doc(user.uid).get()
+      .then((doc) => {
+        if (doc.exists) {
+          currentUser = doc.data();
+          currentUser.uid = user.uid;
+          enterApp();
+        }
+      })
+      .catch((err) => console.error('Session restore error:', err));
+  }
+});
+
+// ── AUTH ──────────────────────────────────────────────────────────────────
+function authMode(m) {
+  document.getElementById('form-login').style.display = m === 'login' ? 'block' : 'none';
+  document.getElementById('form-register').style.display = m === 'register' ? 'block' : 'none';
+  document.querySelectorAll('.auth-tab').forEach((t, i) => t.classList.toggle('active', (i === 0 && m === 'login') || (i === 1 && m === 'register')));
+  document.getElementById('auth-err').style.display = 'none';
+}
+function authErr(msg) { const e = document.getElementById('auth-err'); e.textContent = msg; e.style.display = 'block'; }
+
+function doLogin() {
+  const email = document.getElementById('li-email').value.trim();
+  const pass = document.getElementById('li-pass').value;
+  if (!email || !pass) { authErr('Please fill in all fields.'); return; }
+  if (pass.length < 6) { authErr('Password must be at least 6 characters.'); return; }
+  auth.signInWithEmailAndPassword(email, pass)
+    .then((cred) => db.collection(USERS_COLLECTION).doc(cred.user.uid).get())
+    .then((doc) => {
+      if (!doc.exists) { authErr('Account data not found. Contact support.'); return; }
+      currentUser = doc.data();
+      currentUser.uid = auth.currentUser.uid;
+      enterApp();
+    })
+    .catch((err) => {
+      const map = {
+        'auth/user-not-found': 'No account found. Create one first.',
+        'auth/wrong-password': 'Incorrect password.',
+        'auth/invalid-credential': 'Incorrect email or password.',
+        'auth/invalid-email': 'Enter a valid email address.',
+        'auth/network-request-failed': 'No internet connection — try again when you\'re back online.'
+      };
+      authErr(map[err.code] || err.message);
+    });
+}
+
+function doRegister() {
+  const name = document.getElementById('rg-name').value.trim();
+  const phone = document.getElementById('rg-phone').value.trim();
+  const email = document.getElementById('rg-email').value.trim();
+  const biz = document.getElementById('rg-biz').value.trim();
+  const sector = document.getElementById('rg-sector').value;
+  const pass = document.getElementById('rg-pass').value;
+  if (!name || !email || !biz || !sector || !pass) { authErr('Please fill in all required fields.'); return; }
+  if (pass.length < 6) { authErr('Password must be at least 6 characters.'); return; }
+  if (!email.includes('@')) { authErr('Enter a valid email address.'); return; }
+  auth.createUserWithEmailAndPassword(email, pass)
+    .then((cred) => {
+      const user = { name, phone, email, biz, sector, tier: 'free', products: [], sales: [] };
+      return db.collection(USERS_COLLECTION).doc(cred.user.uid).set(user).then(() => {
+        currentUser = user;
+        currentUser.uid = cred.user.uid;
+        enterApp();
+      });
+    })
+    .catch((err) => {
+      const map = {
+        'auth/email-already-in-use': 'Account already exists. Sign in instead.',
+        'auth/invalid-email': 'Enter a valid email address.',
+        'auth/weak-password': 'Password must be at least 6 characters.',
+        'auth/network-request-failed': 'No internet connection — try again when you\'re back online.'
+      };
+      authErr(map[err.code] || err.message);
+    });
+}
+
+function enterApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  populateSidebar();
+  goPage('dashboard');
+  toast('Welcome, ' + currentUser.name.split(' ')[0] + '! 👋');
+}
+
+function doLogout() {
+  stopScanner();
+  auth.signOut().then(() => {
+    currentUser = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('auth-screen').style.display = 'flex';
+    toast('Signed out.');
+  });
+}
+
+function saveUserData() {
+  if (!currentUser || !currentUser.uid) return;
+  // Debounced so rapid actions (e.g. adjusting sell qty) don't spam writes.
+  clearTimeout(saveDebounceTimer);
+  saveDebounceTimer = setTimeout(() => {
+    const { uid, ...data } = currentUser;
+    db.collection(USERS_COLLECTION).doc(uid).set(data, { merge: true })
+      .catch((err) => console.error('Save error (will retry from Firestore cache when online):', err));
+  }, 400);
+}
+
+function populateSidebar() {
+  const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  document.getElementById('sb-avatar').textContent = initials;
+  document.getElementById('sb-uname').textContent = currentUser.name;
+  document.getElementById('sb-ubiz').textContent = currentUser.biz;
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────
+function openMobileDrawer() { document.getElementById('mobile-nav-drawer').classList.add('open'); }
+function closeMobileDrawer() { document.getElementById('mobile-nav-drawer').classList.remove('open'); }
+
+function goPage(id) {
+  if (scannerActive && id !== 'scan') stopScanner();
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar .sb-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  const map = { dashboard: 0, products: 1, addproduct: 2, scan: 3, mpesa: 4, sales: 5 };
+  const btns = document.querySelectorAll('.sidebar .sb-item');
+  if (btns[map[id]]) btns[map[id]].classList.add('active');
+  const names = { dashboard: 'Dashboard', products: 'My Stock', addproduct: 'Add Product', scan: 'Scan Barcode', mpesa: 'M-Pesa Reader', sales: 'Sales History' };
+  document.getElementById('mtb-page-name').textContent = names[id] || 'BiasharaStock';
+  try {
+    if (id === 'dashboard') refreshDashboard();
+    if (id === 'products') renderProducts();
+    if (id === 'sales') renderSalesHistory();
+    if (id === 'mpesa') renderRecentMpesa();
+  } catch (e) { console.error('Page refresh error:', e); }
+  window.scrollTo(0, 0);
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────
+function refreshDashboard() {
+  const hr = new Date().getHours();
+  document.getElementById('dw-greeting').textContent = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('dw-name').textContent = currentUser.name.split(' ')[0] + ' 👋';
+  const products = currentUser.products || [];
+  const sales = currentUser.sales || [];
+  const totalValue = products.reduce((a, p) => a + (p.stock * p.price), 0);
+  const lowStock = products.filter(p => p.stock <= p.threshold);
+  document.getElementById('stat-products').textContent = products.length;
+  document.getElementById('stat-value').textContent = 'KSh ' + totalValue.toLocaleString('en-KE');
+  document.getElementById('stat-sales').textContent = sales.length;
+  document.getElementById('stat-low').textContent = lowStock.length;
+  document.getElementById('dw-sub').textContent = lowStock.length > 0
+    ? `⚠️ ${lowStock.length} item${lowStock.length !== 1 ? 's' : ''} running low on stock.`
+    : products.length === 0 ? 'Add your first product to get started.' : 'All stock levels look healthy.';
+
+  const recentEl = document.getElementById('dash-recent-sales');
+  const last5 = [...sales].reverse().slice(0, 5);
+  if (!last5.length) {
+    recentEl.innerHTML = '<div class="empty-state"><div class="es-icon">🧾</div><div class="es-text">No sales recorded yet.</div></div>';
+  } else {
+    recentEl.innerHTML = last5.map(s => `
+      <div class="sale-row">
+        <div class="sale-left">
+          <div class="sale-icon">${s.method === 'mpesa' ? '📱' : s.method === 'scan' ? '📷' : '🛒'}</div>
+          <div><div class="sale-name">${s.productName}</div><div class="sale-meta">${s.qty} ${s.unit} ${s.customerName ? '· ' + s.customerName : ''}</div></div>
+        </div>
+        <div class="sale-amt">KSh ${s.total.toLocaleString('en-KE')}</div>
+      </div>`).join('');
+  }
+}
+
+async function getDashboardInsight() {
+  const products = currentUser.products || [];
+  if (!products.length) { toast('Add products first to get insights.'); return; }
+  setAiBtn('dash-insight-btn', 'dash-insight-spin', true);
+  try {
+    const payload = products.map(p => ({ name: p.name, stock: p.stock, threshold: p.threshold, unit: p.unit }));
+    const res = await apiCall('/api/stock-insight', { mode: 'low-stock', payload });
+    document.getElementById('dash-ai-insight').textContent = res.insight;
+  } catch (e) {
+    document.getElementById('dash-ai-insight').textContent = e.message;
+  }
+  setAiBtn('dash-insight-btn', 'dash-insight-spin', false);
+}
+
+// ── PRODUCTS ──────────────────────────────────────────────────────────────
+function addProduct() {
+  const name = document.getElementById('np-name').value.trim();
+  const cat = document.getElementById('np-cat').value;
+  const unit = document.getElementById('np-unit').value;
+  const stock = parseFloat(document.getElementById('np-stock').value);
+  const threshold = parseFloat(document.getElementById('np-threshold').value);
+  const cost = parseFloat(document.getElementById('np-cost').value);
+  const price = parseFloat(document.getElementById('np-price').value);
+  const barcode = document.getElementById('np-barcode').value.trim();
+
+  if (!name || isNaN(stock) || isNaN(price)) { toast('Fill in at least name, stock quantity, and selling price.'); return; }
+
+  const product = {
+    id: Date.now() + Math.random(),
+    name, category: cat, unit,
+    stock, threshold: isNaN(threshold) ? Math.max(1, Math.round(stock * 0.15)) : threshold,
+    cost: isNaN(cost) ? 0 : cost, price, barcode: barcode || null,
+    icon: { Groceries: '🛒', Produce: '🌽', Hardware: '🔧', Beverages: '🥤', Household: '🧴', Other: '📦' }[cat] || '📦'
+  };
+  if (!currentUser.products) currentUser.products = [];
+  currentUser.products.push(product);
+  saveUserData();
+  toast('✅ ' + name + ' added to stock');
+  ['np-name', 'np-stock', 'np-threshold', 'np-cost', 'np-price', 'np-barcode'].forEach(id => document.getElementById(id).value = '');
+  goPage('products');
+}
+
+function renderProducts() {
+  const grid = document.getElementById('product-grid');
+  const search = (document.getElementById('product-search')?.value || '').toLowerCase();
+  const filter = document.getElementById('product-filter')?.value || 'all';
+  let products = currentUser.products || [];
+  if (search) products = products.filter(p => p.name.toLowerCase().includes(search));
+  if (filter === 'low') products = products.filter(p => p.stock <= p.threshold);
+
+  if (!products.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;background:var(--white);border-radius:var(--r2);box-shadow:var(--shadow)"><div class="es-icon">📦</div><div class="es-text">No products found. Add your first product!</div></div>';
+    return;
+  }
+
+  grid.innerHTML = products.map(p => {
+    const isLow = p.stock <= p.threshold;
+    const pct = Math.min(100, Math.max(4, (p.stock / (p.threshold * 3)) * 100));
+    return `
+    <div class="product-card ${isLow ? 'low-stock' : ''}">
+      <div class="pc-badge ${isLow ? 'low' : 'ok'}">${isLow ? 'Low stock' : 'In stock'}</div>
+      <div class="pc-icon">${p.icon}</div>
+      <div class="pc-name">${p.name}</div>
+      <div class="pc-cat">${p.category}</div>
+      <div class="pc-stock-row"><span class="pc-stock-val">${p.stock}</span><span class="pc-stock-unit">${p.unit} remaining</span></div>
+      <div class="pc-stock-bar"><div class="pc-stock-fill" style="width:${pct}%;background:${isLow ? 'var(--rose)' : 'var(--jade)'}"></div></div>
+      <div class="pc-price">KSh ${p.price.toLocaleString('en-KE')} / ${p.unit}</div>
+      <div class="pc-actions">
+        <button class="pc-btn pc-btn-sell" onclick="openSellModal(${p.id})">Sell</button>
+        <button class="pc-btn pc-btn-restock" onclick="openRestockModal(${p.id})">Restock</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── SELL MODAL ────────────────────────────────────────────────────────────
+function openSellModal(id) {
+  const p = currentUser.products.find(x => x.id === id);
+  if (!p) return;
+  sellModalProduct = p; sellModalQty = 1;
+  document.getElementById('sm-product-name').textContent = 'Sell ' + p.name;
+  document.getElementById('sm-product-stock').textContent = p.stock + ' ' + p.unit + ' available';
+  document.getElementById('sm-unit').textContent = p.unit;
+  updateSellModal();
+  document.getElementById('sell-modal').classList.add('open');
+}
+function closeSellModal() { document.getElementById('sell-modal').classList.remove('open'); sellModalProduct = null; }
+function adjustQty(delta) {
+  if (!sellModalProduct) return;
+  const step = sellModalProduct.unit === 'kg' || sellModalProduct.unit === 'litre' ? (sellModalQty >= 1 ? 1 : 0.5) : 1;
+  sellModalQty = Math.max(0.5, sellModalQty + delta * step);
+  if (sellModalQty > sellModalProduct.stock) sellModalQty = sellModalProduct.stock;
+  updateSellModal();
+}
+function updateSellModal() {
+  if (!sellModalProduct) return;
+  document.getElementById('sm-qty').textContent = sellModalQty;
+  const remaining = sellModalProduct.stock - sellModalQty;
+  document.getElementById('sm-remaining').textContent = `Remaining after sale: ${remaining} ${sellModalProduct.unit}`;
+  document.getElementById('sm-total').textContent = 'KSh ' + Math.round(sellModalQty * sellModalProduct.price).toLocaleString('en-KE');
+}
+function confirmSale() {
+  if (!sellModalProduct || sellModalQty <= 0) return;
+  if (sellModalQty > sellModalProduct.stock) { toast('Not enough stock available.'); return; }
+  recordSale(sellModalProduct, sellModalQty, 'manual', null);
+  closeSellModal();
+  renderProducts();
+  toast(`✅ Sold ${sellModalQty} ${sellModalProduct.unit} of ${sellModalProduct.name}`);
+}
+
+// ── RESTOCK MODAL ─────────────────────────────────────────────────────────
+function openRestockModal(id) {
+  const p = currentUser.products.find(x => x.id === id);
+  if (!p) return;
+  restockModalProduct = p;
+  document.getElementById('rm-product-name').textContent = 'Restock ' + p.name;
+  document.getElementById('rm-qty').value = '';
+  document.getElementById('restock-modal').classList.add('open');
+}
+function closeRestockModal() { document.getElementById('restock-modal').classList.remove('open'); restockModalProduct = null; }
+function confirmRestock() {
+  const qty = parseFloat(document.getElementById('rm-qty').value);
+  if (!restockModalProduct || isNaN(qty) || qty <= 0) { toast('Enter a valid quantity.'); return; }
+  restockModalProduct.stock += qty;
+  saveUserData();
+  closeRestockModal();
+  renderProducts();
+  toast(`✅ Added ${qty} ${restockModalProduct.unit} to ${restockModalProduct.name}`);
+}
+
+// ── SALE RECORDING (shared) ──────────────────────────────────────────────
+function recordSale(product, qty, method, customerName, extra) {
+  product.stock = Math.max(0, product.stock - qty);
+  const sale = {
+    id: Date.now() + Math.random(),
+    productId: product.id, productName: product.name, unit: product.unit,
+    qty, total: Math.round(qty * product.price), method,
+    customerName: customerName || null,
+    date: new Date().toISOString(),
+    ...(extra || {})
+  };
+  if (!currentUser.sales) currentUser.sales = [];
+  currentUser.sales.push(sale);
+  saveUserData();
+  return sale;
+}
+
+// ── BARCODE SCANNER ───────────────────────────────────────────────────────
+function toggleScanner() { scannerActive ? stopScanner() : startScanner(); }
+
+function startScanner() {
+  const readerEl = document.getElementById('scan-reader');
+  readerEl.innerHTML = '<div id="qr-reader-inner" style="width:100%"></div>';
+  html5QrCode = new Html5Qrcode("qr-reader-inner");
+  const config = { fps: 10, qrbox: { width: 220, height: 140 } };
+  html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess, () => {})
+    .then(() => {
+      scannerActive = true;
+      document.getElementById('scan-start-btn').querySelector('.btn-ai-text').textContent = '⏹ Stop camera';
+    })
+    .catch(err => {
+      readerEl.innerHTML = '<div class="scan-placeholder">Could not access camera. Make sure you allow camera permission, and that you\'re on HTTPS or localhost.</div>';
+      toast('Camera error: ' + (err.message || err));
+    });
+}
+function stopScanner() {
+  if (html5QrCode && scannerActive) {
+    html5QrCode.stop().then(() => {
+      document.getElementById('scan-reader').innerHTML = '<div class="scan-placeholder">Camera preview will appear here</div>';
+    }).catch(() => {});
+  }
+  scannerActive = false;
+  const btn = document.getElementById('scan-start-btn');
+  if (btn) btn.querySelector('.btn-ai-text').textContent = '📷 Start camera scan';
+}
+function onScanSuccess(decodedText) {
+  document.getElementById('scan-result-code').textContent = decodedText;
+  document.getElementById('scan-result-card').classList.add('show');
+  const matchArea = document.getElementById('scan-match-area');
+  const match = (currentUser.products || []).find(p => p.barcode === decodedText);
+  if (match) {
+    matchArea.innerHTML = `
+      <div style="padding:12px 14px;background:var(--jade-dim);border-radius:8px;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:700;color:var(--jade)">✅ Matched: ${match.name}</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">${match.stock} ${match.unit} in stock · KSh ${match.price}/${match.unit}</div>
+      </div>
+      <button class="btn-primary" onclick="stopScanner();openSellModal(${match.id});goPage('products')">Sell this item</button>`;
+  } else {
+    matchArea.innerHTML = `
+      <div style="padding:12px 14px;background:var(--saffron-dim);border-radius:8px;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:700;color:var(--saffron)">No match found in your stock</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">Add this as a new product with this barcode.</div>
+      </div>
+      <button class="btn-primary" onclick="stopScanner();document.getElementById('np-barcode').value='${decodedText}';goPage('addproduct')">+ Add as new product</button>`;
+  }
+  stopScanner();
+}
+
+// ── M-PESA AI READER ──────────────────────────────────────────────────────
+async function parseMpesa() {
+  const message = document.getElementById('mpesa-input').value.trim();
+  if (!message) { toast('Paste an M-Pesa message first.'); return; }
+  setAiBtn('mpesa-btn', 'mpesa-spin', true);
+  try {
+    const res = await apiCall('/api/parse-mpesa', { message });
+    const d = res.data;
+    document.getElementById('mpe-name').textContent = d.customerName || '—';
+    document.getElementById('mpe-amount').textContent = d.amount ? 'KSh ' + Number(d.amount).toLocaleString('en-KE') : '—';
+    document.getElementById('mpe-phone').textContent = d.phone || '—';
+    document.getElementById('mpe-code').textContent = d.transactionCode || '—';
+    document.getElementById('mpe-date').textContent = (d.date || '—') + (d.time ? ' ' + d.time : '');
+    document.getElementById('mpe-type').textContent = d.type || 'unknown';
+    const warnEl = document.getElementById('mpe-low-conf-warning');
+    warnEl.innerHTML = d.confidence === 'low' ? '<div class="mpe-low-confidence">⚠️ Low confidence — double check these details before saving.</div>' : '';
+    window._lastMpesaData = d;
+    document.getElementById('mpesa-result').classList.add('show');
+    toast('✨ Message read successfully');
+  } catch (e) {
+    toast(e.message);
+  }
+  setAiBtn('mpesa-btn', 'mpesa-spin', false);
+}
+
+function recordMpesaSale() {
+  const d = window._lastMpesaData;
+  if (!d) return;
+  if (!currentUser.sales) currentUser.sales = [];
+  const sale = {
+    id: Date.now() + Math.random(),
+    productId: null, productName: 'M-Pesa payment', unit: '',
+    qty: 1, total: Math.round(d.amount || 0), method: 'mpesa',
+    customerName: d.customerName, mpesaCode: d.transactionCode, phone: d.phone,
+    date: new Date().toISOString()
+  };
+  currentUser.sales.push(sale);
+  saveUserData();
+  toast('✅ Saved: KSh ' + sale.total.toLocaleString('en-KE') + ' from ' + (d.customerName || 'customer'));
+  document.getElementById('mpesa-input').value = '';
+  document.getElementById('mpesa-result').classList.remove('show');
+  renderRecentMpesa();
+}
+
+function renderRecentMpesa() {
+  const list = document.getElementById('recent-mpesa-list');
+  const mpesaSales = (currentUser.sales || []).filter(s => s.method === 'mpesa').reverse().slice(0, 6);
+  if (!mpesaSales.length) { list.innerHTML = ''; return; }
+  list.innerHTML = '<div class="dc-title" style="margin-bottom:14px">Recently recorded</div>' + mpesaSales.map(s => `
+    <div class="rm-item">
+      <div><div class="rm-name">${s.customerName || 'Unknown'}</div><div class="rm-meta">${s.mpesaCode || ''} · ${new Date(s.date).toLocaleDateString('en-KE')}</div></div>
+      <div class="rm-amt">KSh ${s.total.toLocaleString('en-KE')}</div>
+    </div>`).join('');
+}
+
+// ── SALES HISTORY ─────────────────────────────────────────────────────────
+function renderSalesHistory() {
+  const card = document.getElementById('sales-history-card');
+  const sales = [...(currentUser.sales || [])].reverse();
+  if (!sales.length) {
+    card.innerHTML = '<div class="empty-state"><div class="es-icon">🧾</div><div class="es-text">No sales recorded yet.</div></div>';
+    return;
+  }
+  card.innerHTML = sales.map(s => `
+    <div class="sale-row">
+      <div class="sale-left">
+        <div class="sale-icon">${s.method === 'mpesa' ? '📱' : s.method === 'scan' ? '📷' : '🛒'}</div>
+        <div>
+          <div class="sale-name">${s.productName}</div>
+          <div class="sale-meta">${s.qty ? s.qty + ' ' + s.unit + ' · ' : ''}${s.customerName ? s.customerName + ' · ' : ''}${new Date(s.date).toLocaleString('en-KE')}</div>
+        </div>
+      </div>
+      <div class="sale-amt">KSh ${s.total.toLocaleString('en-KE')}</div>
+    </div>`).join('');
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function setAiBtn(btnId, spinId, loading) {
+  const btn = document.getElementById(btnId);
+  const spin = document.getElementById(spinId);
+  if (loading) { btn.classList.add('loading'); spin.style.display = 'block'; }
+  else { btn.classList.remove('loading'); spin.style.display = 'none'; }
+}
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.style.display = 'block';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.style.display = 'none', 3500);
+}
+
+// ── PWA: SERVICE WORKER + INSTALL PROMPT ─────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+  });
+}
+
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const btn = document.getElementById('pwa-install-btn');
+  if (btn) btn.style.display = 'flex';
+});
+
+function installPwa() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.finally(() => {
+    deferredInstallPrompt = null;
+    const btn = document.getElementById('pwa-install-btn');
+    if (btn) btn.style.display = 'none';
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  toast('✅ BiasharaStock installed');
+  const btn = document.getElementById('pwa-install-btn');
+  if (btn) btn.style.display = 'none';
+});
+
+// Offline / online indicator
+window.addEventListener('offline', () => toast('📡 You are offline — your data is still saved on this device.'));
+window.addEventListener('online', () => toast('✅ Back online.'));
+</script>
+</body>
+</html>
